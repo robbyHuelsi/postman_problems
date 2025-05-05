@@ -127,3 +127,5 @@ postman_problems/examples/star/output/rpp_graph.gif
 # pypi
 .pypirc
 
+# VS Code
+.vscode/
