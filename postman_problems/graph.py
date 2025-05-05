@@ -1,4 +1,5 @@
 import warnings
+
 import networkx as nx
 import pandas as pd
 
@@ -12,6 +13,7 @@ def read_edgelist(edgelist_filename, keep_optional=False):
 
     Returns:
         pandas dataframe of edgelist
+
     """
     el = pd.read_csv(edgelist_filename, dtype={0: str, 1: str})  # node_ids as strings makes life easier
     el = el.dropna(how="all")  # drop rows with all NAs... as I find CSVs created w Numbers annoyingly do.
@@ -47,13 +49,14 @@ def create_networkx_graph_from_edgelist(edgelist, edge_id="id"):
     Returns:
         networkx.MultiGraph:
             Returning a MultiGraph rather than Graph to support parallel edges
+
     """
     g = nx.MultiGraph()
     if edge_id in edgelist.columns:
         warnings.warn(
-            "{} is already an edge attribute in `edgelist`.  We will try to use it, but recommend "
+            f"{edge_id} is already an edge attribute in `edgelist`.  We will try to use it, but recommend "
             "renaming this column in your edgelist to allow this function to create it in a standardized way"
-            "where it is guaranteed to be unique".format(edge_id)
+            "where it is guaranteed to be unique"
         )
 
     for i, row in enumerate(edgelist.iterrows()):
@@ -73,6 +76,7 @@ def _get_even_or_odd_nodes(graph, mod):
 
     Returns:
         list[str]: list of node names of odd or even degree
+
     """
     degree_nodes = []
     for v, d in graph.degree():
@@ -90,6 +94,7 @@ def get_odd_nodes(graph):
 
     Returns:
         list[str]: names of nodes with odd degree
+
     """
     return _get_even_or_odd_nodes(graph, 1)
 
@@ -119,6 +124,7 @@ def get_shortest_paths_distances(graph, pairs, edge_weight_name="distance"):
 
     Returns:
         dict: mapping each pair in `pairs` to the shortest path using `edge_weight_name` between them.
+
     """
     distances = {}
     for pair in pairs:
@@ -137,11 +143,12 @@ def create_complete_graph(pair_weights, flip_weights=True):
 
     Returns:
         complete (fully connected graph) networkx graph using the node pairs and distances provided in `pair_weights`
+
     """
     g = nx.Graph()
     for k, v in pair_weights.items():
         wt_i = -v if flip_weights else v
-        g.add_edge(k[0], k[1], **{"distance": v, "weight": wt_i})
+        g.add_edge(k[0], k[1], distance=v, weight=wt_i)
     return g
 
 
@@ -154,6 +161,7 @@ def dedupe_matching(matching):
 
     Returns:
         list[2tuples]: list of node pairs from `matching` deduped (ignoring order).
+
     """
     matched_pairs_w_dupes = [tuple(sorted([k, v])) for k, v in matching.items()]
     return list(set(matched_pairs_w_dupes))
@@ -173,16 +181,14 @@ def add_augmenting_path_to_graph(graph, min_weight_pairs, edge_weight_name="weig
 
     Returns:
         networkx graph: `graph` augmented with edges between the odd nodes specified in `min_weight_pairs`
+
     """
     graph_aug = graph.copy()  # so we don't mess with the original graph
     for pair in min_weight_pairs:
         graph_aug.add_edge(
             pair[0],
             pair[1],
-            **{
-                "distance": nx.dijkstra_path_length(graph, pair[0], pair[1], weight=edge_weight_name),
-                "augmented": True,
-            },
+            distance=nx.dijkstra_path_length(graph, pair[0], pair[1], weight=edge_weight_name), augmented=True,
         )
     return graph_aug
 
@@ -202,6 +208,7 @@ def create_eulerian_circuit(graph_augmented, graph_original, start_node=None):
 
     Returns:
         networkx graph (`graph_original`) augmented with edges directly between the odd nodes
+
     """
 
     euler_circuit = list(nx.eulerian_circuit(graph_augmented, source=start_node, keys=True))
@@ -215,7 +222,7 @@ def create_eulerian_circuit(graph_augmented, graph_original, start_node=None):
         if not edge_attr.get("augmented"):
             yield edge + (edge_attr,)
         else:
-            for edge_aug in list(zip(aug_path[:-1], aug_path[1:])):
+            for edge_aug in list(zip(aug_path[:-1], aug_path[1:], strict=False)):
                 # find edge with shortest distance (if there are two parallel edges between the same nodes)
                 edge_aug_dict = graph_original[edge_aug[0]][edge_aug[1]]
                 edge_key = min(
@@ -240,6 +247,7 @@ def create_required_graph(graph):
 
     Returns:
         networkx MultiGraph with optional nodes and edges deleted
+
     """
 
     graph_req = graph.copy()  # preserve original structure
@@ -265,6 +273,7 @@ def assert_graph_is_connected(graph):
 
     Returns:
         True if graph is connected
+
     """
 
     assert nx.algorithms.connected.is_connected(graph), (

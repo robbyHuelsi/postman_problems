@@ -1,4 +1,5 @@
 import pytest
+
 from postman_problems.solver import cpp, rpp
 from postman_problems.tests.test_stats import (
     test_stats_on_simple_graph_required_edges_only,

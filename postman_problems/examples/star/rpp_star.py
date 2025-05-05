@@ -1,10 +1,12 @@
-import pkg_resources
 import logging
 import string
+
 import networkx as nx
-from postman_problems.tests.utils import create_mock_csv_from_dataframe
+import pkg_resources
+
+from postman_problems.solver import cpp, rpp
 from postman_problems.stats import calculate_postman_solution_stats
-from postman_problems.solver import rpp, cpp
+from postman_problems.tests.utils import create_mock_csv_from_dataframe
 
 
 def create_star_graph(n_nodes=10, ring=True):
@@ -25,7 +27,7 @@ def create_star_graph(n_nodes=10, ring=True):
     nx.set_edge_attributes(graph, 1, "required")
     nx.set_edge_attributes(graph, "solid", "style")
     if ring:
-        for e in list(zip(node_names[1:-1] + [node_names[1]], node_names[2:] + [node_names[-1]])):
+        for e in list(zip(node_names[1:-1] + [node_names[1]], node_names[2:] + [node_names[-1]], strict=False)):
             graph.add_edge(e[0], e[1], distance=2, required=0, style="dashed")
     return graph
 
@@ -95,7 +97,7 @@ def main():
     # VIZ -------------------------------------------------------------------------------
 
     try:
-        from postman_problems.viz import plot_circuit_graphviz, plot_graphviz, make_circuit_images, make_circuit_video
+        from postman_problems.viz import make_circuit_images, make_circuit_video, plot_circuit_graphviz, plot_graphviz
 
         logger.info("Creating single SVG of base graph")
         plot_graphviz(

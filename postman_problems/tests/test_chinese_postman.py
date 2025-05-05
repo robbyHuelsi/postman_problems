@@ -1,13 +1,13 @@
-import sys
 import os
-import pytest
-import tempfile
 import shutil
-import pkg_resources
+import sys
+import tempfile
 from unittest.mock import patch
-from postman_problems.postman_chinese import chinese_postman
-from pytest_console_scripts import script_runner
 
+import pkg_resources
+import pytest
+
+from postman_problems.postman_chinese import chinese_postman
 
 # input params
 EDGELIST_SEVEN_BRIDGES = pkg_resources.resource_filename(

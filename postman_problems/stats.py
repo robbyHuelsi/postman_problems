@@ -10,6 +10,7 @@ def calculate_postman_solution_stats(circuit, edge_weight_name="distance"):
 
     Returns:
         summary table (OrderedDict)
+
     """
     summary_stats = collections.OrderedDict()
 

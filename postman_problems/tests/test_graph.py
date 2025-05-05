@@ -4,20 +4,20 @@ import warnings
 
 import networkx as nx
 import pytest
-from postman_problems.graph import (
-    read_edgelist,
-    create_networkx_graph_from_edgelist,
-    get_odd_nodes,
-    get_even_nodes,
-    get_shortest_paths_distances,
-    create_complete_graph,
-    dedupe_matching,
-    add_augmenting_path_to_graph,
-    create_eulerian_circuit,
-    assert_graph_is_connected,
-    create_required_graph,
-)
 
+from postman_problems.graph import (
+    add_augmenting_path_to_graph,
+    assert_graph_is_connected,
+    create_complete_graph,
+    create_eulerian_circuit,
+    create_networkx_graph_from_edgelist,
+    create_required_graph,
+    dedupe_matching,
+    get_even_nodes,
+    get_odd_nodes,
+    get_shortest_paths_distances,
+    read_edgelist,
+)
 
 # ###################
 # PARAMETERS / DATA #

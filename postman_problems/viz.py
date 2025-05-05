@@ -1,11 +1,12 @@
-import os
 import glob
-import imageio
-import tqdm
-import numpy as np
-import networkx as nx
-import graphviz as gv
+import os
 from collections import defaultdict
+
+import graphviz as gv
+import imageio
+import networkx as nx
+import numpy as np
+import tqdm
 
 
 def add_node_attributes(graph, nodelist):
@@ -21,6 +22,7 @@ def add_node_attributes(graph, nodelist):
 
     Returns:
         networkx graph: original `graph` augmented w node attributes
+
     """
     for i, row in nodelist.iterrows():
         nx.set_node_attributes(graph, {row["id"]: row.to_dict()})
@@ -39,6 +41,7 @@ def add_pos_node_attribute(graph, origin="bottomleft"):
 
     Returns:
         networkx graph with the node attributes added to graph
+
     """
 
     ori = {
@@ -56,7 +59,7 @@ def add_pos_node_attribute(graph, origin="bottomleft"):
             )
         except KeyError as e:
             print(e)
-            print("No X, Y coordinates found for node: {}".format(node_id))
+            print(f"No X, Y coordinates found for node: {node_id}")
     return graph
 
 
@@ -74,6 +77,7 @@ def prepare_networkx_graph_circuit_for_transformation_to_graphviz(circuit, graph
 
     Returns:
         networkx graph: `graph` augmented with information from `circuit`
+
     """
     edge_cnter = defaultdict(lambda: 0)
     for i, e in enumerate(circuit):
@@ -108,6 +112,7 @@ def convert_networkx_graph_to_graphiz(graph, directed=False):
 
     Returns:
         graphviz.dot.Graph: conversion of `graph` to a graphviz dot object.
+
     """
     if directed:
         G = gv.Digraph()
@@ -154,6 +159,7 @@ def plot_graphviz(
     Returns:
         graphviz.Graph or graphviz.DirectedGraph with
         Writes a visualization to disk if filename is provided.
+
     """
 
     if edge_label_attr:
@@ -185,7 +191,7 @@ def plot_graphviz(
     if filename:
         graph_gv.render(filename=filename, view=False)
 
-    return "Plot written to {}".format(filename)
+    return f"Plot written to {filename}"
 
 
 def plot_circuit_graphviz(
@@ -219,6 +225,7 @@ def plot_circuit_graphviz(
     Returns:
         graphviz.Graph or graphviz.DirectedGraph with enriched route and plotting data.
         Writes a visualization to disk if filename is provided.
+
     """
 
     graph_gv = prepare_networkx_graph_circuit_for_transformation_to_graphviz(circuit, graph, edge_label_attr)
@@ -251,6 +258,7 @@ def make_circuit_images(
 
     Returns:
         No return value.  Writes a viz to disk for each instruction in the CPP.
+
     """
     graph_white = prepare_networkx_graph_circuit_for_transformation_to_graphviz(circuit, graph.copy())
 
@@ -280,12 +288,13 @@ def make_circuit_images(
 
         graph_white[e[0]][e[1]][key]["color"] = "black"  # set walked edge back to black
 
-    return "Images created in {}".format(outfile_dir)
+    return f"Images created in {outfile_dir}"
 
 
 def make_circuit_video(infile_dir_images, outfile_movie, fps=3, format="png"):
     """
     Create a movie that visualizes the CPP solution from a series of static images.
+
     Args:
         infile_dir_images (str): path to list of images named like `img[X].png`.  These are produced from make_circuit_images
         outfile_movie (str): filename of created movie/gif (output)
@@ -294,6 +303,7 @@ def make_circuit_video(infile_dir_images, outfile_movie, fps=3, format="png"):
 
     Returns:
         No return value.  Writes a movie/gif to disk
+
     """
     # sorting filenames in order
     filenames = glob.glob(os.path.join(infile_dir_images, "img*.%s" % format))
@@ -305,4 +315,4 @@ def make_circuit_video(infile_dir_images, outfile_movie, fps=3, format="png"):
         for filename in tqdm.tqdm(filenames):
             image = imageio.imread(filename)
             writer.append_data(image)
-    return "Movie written to {}".format(outfile_movie)
+    return f"Movie written to {outfile_movie}"

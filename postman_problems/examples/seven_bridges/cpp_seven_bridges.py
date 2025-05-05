@@ -25,7 +25,9 @@ Usage:
 """
 
 import logging
+
 import pkg_resources
+
 from postman_problems.solver import cpp
 from postman_problems.stats import calculate_postman_solution_stats
 
@@ -69,7 +71,7 @@ def main():
     # VIZ -------------------------------------------------------------------------------
 
     try:
-        from postman_problems.viz import plot_circuit_graphviz, make_circuit_images, make_circuit_video
+        from postman_problems.viz import make_circuit_images, make_circuit_video, plot_circuit_graphviz
 
         logger.info("Creating single SVG of base graph")
         plot_circuit_graphviz(

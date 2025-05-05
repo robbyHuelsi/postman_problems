@@ -1,7 +1,7 @@
-import pandas as pd
 import networkx as nx
-from postman_problems.viz import add_node_attributes
+import pandas as pd
 
+from postman_problems.viz import add_node_attributes
 
 # ###################
 # PARAMETERS / DATA #

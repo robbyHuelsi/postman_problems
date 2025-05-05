@@ -1,16 +1,18 @@
-import math
-import pkg_resources
 import itertools
-import pandas as pd
+import math
+
 import networkx as nx
-from postman_problems.viz import add_node_attributes
+import pandas as pd
+import pkg_resources
+
 from postman_problems.graph import (
-    read_edgelist,
     create_networkx_graph_from_edgelist,
     get_odd_nodes,
     get_shortest_paths_distances,
+    read_edgelist,
 )
-from postman_problems.solver import rpp, cpp
+from postman_problems.solver import cpp, rpp
+from postman_problems.viz import add_node_attributes
 
 # ###################
 # PARAMETERS / DATA #
@@ -113,12 +115,12 @@ def test_nodelist_edgelist_overlap():
 
     nodes_in_el_but_not_nl = edgelist_nodes - nodelist_nodes
     assert nodes_in_el_but_not_nl == set(), (
-        "Warning: The following nodes are in the edgelist, but not the nodelist: {}".format(nodes_in_el_but_not_nl)
+        f"Warning: The following nodes are in the edgelist, but not the nodelist: {nodes_in_el_but_not_nl}"
     )
 
     nodes_in_nl_but_not_el = nodelist_nodes - edgelist_nodes
     assert nodes_in_nl_but_not_el == set(), (
-        "Warning: The following nodes are in the nodelist, but not the edgelist: {}".format(nodes_in_nl_but_not_el)
+        f"Warning: The following nodes are in the nodelist, but not the edgelist: {nodes_in_nl_but_not_el}"
     )
 
 

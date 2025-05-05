@@ -1,15 +1,17 @@
-import os
 import argparse
 import logging
+import os
+
 from postman_problems.solver import cpp, rpp
-from postman_problems.viz import plot_circuit_graphviz, make_circuit_video, make_circuit_images
 from postman_problems.stats import calculate_postman_solution_stats
+from postman_problems.viz import make_circuit_images, make_circuit_video, plot_circuit_graphviz
 
 
 def get_args():
     """
     Returns:
         argparse.Namespace: parsed arguments from the user
+
     """
     parser = argparse.ArgumentParser(description="Arguments to the Chinese Postman Problem solver")
 
@@ -138,6 +140,7 @@ def generic_postman(postman_type):
 
     Args:
         postman_type (str): "rural" or "chinese"
+
     """
 
     if postman_type == "rural":
@@ -152,7 +155,7 @@ def generic_postman(postman_type):
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
 
-    logger.info("Solving the {} postman problem..".format(postman_type))
+    logger.info(f"Solving the {postman_type} postman problem..")
     circuit, graph = postman_algo(
         edgelist_filename=args.edgelist, start_node=args.start_node, edge_weight=args.edge_weight
     )
@@ -166,7 +169,7 @@ def generic_postman(postman_type):
         logger.info(str(k) + " : " + str(v))
 
     if args.viz:
-        logger.info("Creating single image of {} postman solution...".format(postman_type))
+        logger.info(f"Creating single image of {postman_type} postman solution...")
         message_static = plot_circuit_graphviz(
             circuit=circuit, graph=graph, filename=args.viz_filename, format=args.viz_format, engine=args.viz_engine
         )

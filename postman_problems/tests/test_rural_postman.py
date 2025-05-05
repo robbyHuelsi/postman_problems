@@ -1,11 +1,11 @@
 import os
 import sys
+from unittest.mock import patch
+
 import pkg_resources
 import pytest
-from unittest.mock import patch
-from pytest_console_scripts import script_runner
-from postman_problems.postman_rural import rural_postman
 
+from postman_problems.postman_rural import rural_postman
 
 # input params
 EDGELIST_SLEEPING_GIANT = pkg_resources.resource_filename(

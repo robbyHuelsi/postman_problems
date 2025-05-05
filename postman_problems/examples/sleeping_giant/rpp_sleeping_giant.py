@@ -1,8 +1,10 @@
 """ """
 
 import logging
-import pkg_resources
+
 import pandas as pd
+import pkg_resources
+
 from postman_problems.solver import rpp
 from postman_problems.stats import calculate_postman_solution_stats
 
@@ -53,11 +55,11 @@ def main():
 
     try:
         from postman_problems.viz import (
-            add_pos_node_attribute,
             add_node_attributes,
-            plot_circuit_graphviz,
+            add_pos_node_attribute,
             make_circuit_images,
             make_circuit_video,
+            plot_circuit_graphviz,
         )
 
         logger.info("Add node attributes to graph")

@@ -1,8 +1,8 @@
-import pytest
 import networkx as nx
 import pandas as pd
-from postman_problems.tests.utils import create_mock_csv_from_dataframe
+import pytest
 
+from postman_problems.tests.utils import create_mock_csv_from_dataframe
 
 # ---------------------------------------------------------------------------------------
 # Configuration for slow tests

@@ -1,20 +1,19 @@
 import itertools
 import logging
+
 import networkx as nx
 
 from postman_problems.graph import (
-    read_edgelist,
+    add_augmenting_path_to_graph,
+    assert_graph_is_connected,
+    create_complete_graph,
+    create_eulerian_circuit,
     create_networkx_graph_from_edgelist,
     create_required_graph,
-    assert_graph_is_connected,
     get_odd_nodes,
     get_shortest_paths_distances,
-    create_complete_graph,
-    dedupe_matching,
-    add_augmenting_path_to_graph,
-    create_eulerian_circuit,
+    read_edgelist,
 )
-
 
 logger_rpp = logging.getLogger("{0}.{1}".format(__name__, "rpp"))
 logger_cpp = logging.getLogger("{0}.{1}".format(__name__, "cpp"))
@@ -39,6 +38,7 @@ def rpp(edgelist_filename, start_node=None, edge_weight="distance", verbose=Fals
           The second element is the end ("to") node.
           The third element is the dict of edge attributes for that edge.
         The original graph is returned as well.  This is needed for visualization
+
     """
 
     logger_rpp.disabled = not verbose
@@ -89,6 +89,7 @@ def cpp(edgelist_filename, start_node=None, edge_weight="distance", verbose=Fals
           The second element is the end ("to") node.
           The third element is the dict of edge attributes for that edge.
         The original graph is returned as well.  This is needed for visualization
+
     """
     logger_cpp.disabled = not verbose
 
