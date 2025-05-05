@@ -110,7 +110,7 @@ def test_nodelist_edgelist_overlap():
     """
     eldf = read_edgelist(EDGELIST, keep_optional=True)
     nldf = pd.read_csv(NODELIST)
-    edgelist_nodes = set(eldf["node1"].append(eldf["node2"]))
+    edgelist_nodes = set(pd.concat([eldf["node1"], eldf["node2"]]))
     nodelist_nodes = set(nldf["id"])
 
     nodes_in_el_but_not_nl = edgelist_nodes - nodelist_nodes
