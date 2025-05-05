@@ -14,23 +14,26 @@ def read_edgelist(edgelist_filename, keep_optional=False):
         pandas dataframe of edgelist
     """
     el = pd.read_csv(edgelist_filename, dtype={0: str, 1: str})  # node_ids as strings makes life easier
-    el = el.dropna(how='all')  # drop rows with all NAs... as I find CSVs created w Numbers annoyingly do.
+    el = el.dropna(how="all")  # drop rows with all NAs... as I find CSVs created w Numbers annoyingly do.
 
-    if (not keep_optional) & ('required' in el.columns):
-        el = el[el['required'] == 1]
+    if (not keep_optional) & ("required" in el.columns):
+        el = el[el["required"] == 1]
 
-    assert 'augmented' not in el.columns, \
+    assert "augmented" not in el.columns, (
         'Edgelist cannot contain a column named "augmented", sorry. This will cause computation problems'
+    )
 
-    if 'id' in el.columns:
-        warnings.warn("Edgelist contains field named 'id'.  This is a field that will be assigned to edge attributes "
-                      "with the `create_networkx_graph_from_edgelist function.  That is OK though.  We'll use your 'id'"
-                      "field if it is unique.")
-        assert el['id'].nunique() == len(el), 'Provided edge "id" field is not unique.  Please drop "id" or try again.'
+    if "id" in el.columns:
+        warnings.warn(
+            "Edgelist contains field named 'id'.  This is a field that will be assigned to edge attributes "
+            "with the `create_networkx_graph_from_edgelist function.  That is OK though.  We'll use your 'id'"
+            "field if it is unique."
+        )
+        assert el["id"].nunique() == len(el), 'Provided edge "id" field is not unique.  Please drop "id" or try again.'
     return el
 
 
-def create_networkx_graph_from_edgelist(edgelist, edge_id='id'):
+def create_networkx_graph_from_edgelist(edgelist, edge_id="id"):
     """
     Create a networkx MultiGraph object from an edgelist (pandas dataframe).
     Used to create the user's starting graph for which a CPP solution is desired.
@@ -47,9 +50,11 @@ def create_networkx_graph_from_edgelist(edgelist, edge_id='id'):
     """
     g = nx.MultiGraph()
     if edge_id in edgelist.columns:
-        warnings.warn('{} is already an edge attribute in `edgelist`.  We will try to use it, but recommend '
-                      'renaming this column in your edgelist to allow this function to create it in a standardized way'
-                      'where it is guaranteed to be unique'.format(edge_id))
+        warnings.warn(
+            "{} is already an edge attribute in `edgelist`.  We will try to use it, but recommend "
+            "renaming this column in your edgelist to allow this function to create it in a standardized way"
+            "where it is guaranteed to be unique".format(edge_id)
+        )
 
     for i, row in enumerate(edgelist.iterrows()):
         edge_attr_dict = row[1][2:].to_dict()
@@ -103,7 +108,7 @@ def get_even_nodes(graph):
     return _get_even_or_odd_nodes(graph, 0)
 
 
-def get_shortest_paths_distances(graph, pairs, edge_weight_name='distance'):
+def get_shortest_paths_distances(graph, pairs, edge_weight_name="distance"):
     """
     Calculate shortest distance between each pair of nodes in a graph
 
@@ -136,7 +141,7 @@ def create_complete_graph(pair_weights, flip_weights=True):
     g = nx.Graph()
     for k, v in pair_weights.items():
         wt_i = -v if flip_weights else v
-        g.add_edge(k[0], k[1], **{'distance': v, 'weight': wt_i})
+        g.add_edge(k[0], k[1], **{"distance": v, "weight": wt_i})
     return g
 
 
@@ -154,7 +159,7 @@ def dedupe_matching(matching):
     return list(set(matched_pairs_w_dupes))
 
 
-def add_augmenting_path_to_graph(graph, min_weight_pairs, edge_weight_name='weight'):
+def add_augmenting_path_to_graph(graph, min_weight_pairs, edge_weight_name="weight"):
     """
     Add the min weight matching edges to the original graph
     Note the resulting graph could (and likely will) have edges that didn't exist on the original graph.  To get the
@@ -171,11 +176,14 @@ def add_augmenting_path_to_graph(graph, min_weight_pairs, edge_weight_name='weig
     """
     graph_aug = graph.copy()  # so we don't mess with the original graph
     for pair in min_weight_pairs:
-        graph_aug.add_edge(pair[0],
-                           pair[1],
-                           **{'distance': nx.dijkstra_path_length(graph, pair[0], pair[1], weight=edge_weight_name),
-                              'augmented': True}
-                           )
+        graph_aug.add_edge(
+            pair[0],
+            pair[1],
+            **{
+                "distance": nx.dijkstra_path_length(graph, pair[0], pair[1], weight=edge_weight_name),
+                "augmented": True,
+            },
+        )
     return graph_aug
 
 
@@ -197,22 +205,29 @@ def create_eulerian_circuit(graph_augmented, graph_original, start_node=None):
     """
 
     euler_circuit = list(nx.eulerian_circuit(graph_augmented, source=start_node, keys=True))
-    assert len(graph_augmented.edges()) == len(euler_circuit), 'graph and euler_circuit do not have equal number of edges.'
+    assert len(graph_augmented.edges()) == len(euler_circuit), (
+        "graph and euler_circuit do not have equal number of edges."
+    )
 
     for edge in euler_circuit:
-        aug_path = nx.shortest_path(graph_original, edge[0], edge[1], weight='distance')
+        aug_path = nx.shortest_path(graph_original, edge[0], edge[1], weight="distance")
         edge_attr = graph_augmented[edge[0]][edge[1]][edge[2]]
-        if not edge_attr.get('augmented'):
+        if not edge_attr.get("augmented"):
             yield edge + (edge_attr,)
         else:
             for edge_aug in list(zip(aug_path[:-1], aug_path[1:])):
                 # find edge with shortest distance (if there are two parallel edges between the same nodes)
                 edge_aug_dict = graph_original[edge_aug[0]][edge_aug[1]]
-                edge_key = min(edge_aug_dict.keys(), key=(lambda k: edge_aug_dict[k]['distance']))  # index with min distance
+                edge_key = min(
+                    edge_aug_dict.keys(), key=(lambda k: edge_aug_dict[k]["distance"])
+                )  # index with min distance
                 edge_aug_shortest = edge_aug_dict[edge_key]
-                edge_aug_shortest['augmented'] = True
-                edge_aug_shortest['id'] = edge_aug_dict[edge_key]['id']
-                yield edge_aug + (edge_key, edge_aug_shortest, )
+                edge_aug_shortest["augmented"] = True
+                edge_aug_shortest["id"] = edge_aug_dict[edge_key]["id"]
+                yield edge_aug + (
+                    edge_key,
+                    edge_aug_shortest,
+                )
 
 
 def create_required_graph(graph):
@@ -231,7 +246,7 @@ def create_required_graph(graph):
 
     # remove optional edges
     for e in list(graph_req.edges(data=True, keys=True)):
-        if not e[3]['required']:
+        if not e[3]["required"]:
             graph_req.remove_edge(e[0], e[1], key=e[2])
 
     # remove any nodes left isolated after optional edges are removed (no required incident edges)
@@ -252,9 +267,10 @@ def assert_graph_is_connected(graph):
         True if graph is connected
     """
 
-    assert nx.algorithms.connected.is_connected(graph), "Sorry, the required graph is not a connected graph after " \
-                                                        "the optional edges are removed.  This is a requirement for " \
-                                                        "this implementation of the RPP here which generalizes to the " \
-                                                        "CPP."
+    assert nx.algorithms.connected.is_connected(graph), (
+        "Sorry, the required graph is not a connected graph after "
+        "the optional edges are removed.  This is a requirement for "
+        "this implementation of the RPP here which generalizes to the "
+        "CPP."
+    )
     return True
-
