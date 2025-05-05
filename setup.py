@@ -14,7 +14,7 @@ def read(fname):
 
 setup(
     name="postman_problems",
-    version="0.4",
+    version="0.5",
     author="Andrew Brooks",
     author_email="andrewbrooks@gmail.com",
     description="Solutions to Postman graph optimization problems: Chinese and Rural Postman problems",
